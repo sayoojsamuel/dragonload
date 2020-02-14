@@ -1,0 +1,55 @@
+#+TITLE: README
+
+* dragonload Distributed Downlaod Manager
+** Tasks
+[ ] Design a robust backend
+[ ] Manage the protocol
+[ ] Test the platform
+[ ] Try to convert the commands to python only; platform independance
+** Tesing
+[ ] Check for partial download;
+** Protocol
+*** Splitfire Protocol
+This protocol is responsible for managing all the interested parties into one
+pool.
+**** Objective
+- Create Pool for interested Parties; N party proto
+- Check the file size;
+- Split the fileSize by a multiple of N
+- Collect user IP's
+- Generate the download script. Notify the CNC after each successful download;
+  Realtime progress for the pool
+- Schedule Download??? Take care of the sleep
+- Manage Parties who leave in between the protocol
+- Split part of the remaining itemsList to the newcomming member; Dynamic Pool
+  Model
+-
+*** ChainRain Protocol
+This protocol is for efficiently sharing the files after partly download among
+the decorated users.
+**** Objectives
+- Verify if parties are still active during the process
+- Check connection with the CNC
+- Share files parallely, efficiently and equally among the users. (check for
+  corruptions)
+- Test if local hosting is proper
+- Share in a binary Tree manner
+- Merge the parts as and when they arrive. Notify other about the status of the
+  proces
+
+*** Dragonvault Protocol
+This is the main server application, which will handle the whole download
+manager.  This can be implemented in two ways:
+- A centralized main server
+- A requirement based
+** Ideas
+*** [ ] Simustaneous running of Splitfile and ChainRain in pipeline
+*** [ ] Add MultiThreaded Download for individual parts
+*** [ ] Authenticated Private Rooms
+*** [ ] curses based application
+*** [ ] Use click and pyinquirer, prompt-toolkit
+*** [ ] Use grpc for client, server, and all comms
+***** [ ] Create robust framework, and build curses app, web app on top
+
+** Necessary Reads
+*** [[https://medium.com/@ageitgey/python-3-quick-tip-the-easy-way-to-deal-with-file-paths-on-windows-mac-and-linux-11a072b58d5f][Pathlib]]: Article to make os independent paths
