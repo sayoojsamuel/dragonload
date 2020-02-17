@@ -106,7 +106,7 @@ def partitionManager(url: str, fileSize: int, user_count: int) -> bool:
     return True
 
 
-def downloadPart(url: str, start: int, end= int, filename= str) -> (bool, str):
+def downloadPart(url: str, start: int, end: int, filename: str) -> (bool, str):
     """Returns statusCode
 
     Helps to download a segment of a data as filename. Uses tqdm to display progressbar

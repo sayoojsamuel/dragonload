@@ -4,7 +4,7 @@ import os.path
 import shutil # this instead of mmap
 from subprocess import Popen, PIPE
 from dragonload.util.logging import logger
-from util import get_host_details
+from dragonload.chainrain.util import get_host_details
 
 """
 program should handle sharing files!!!
@@ -13,7 +13,7 @@ program should handle sharing files!!!
 - ** share only relavant files
 - ** get required files.
 - ** needs to keep the files in a unique directory!!!
-- merge the parts into one downloaded file
+- [x] merge the parts into one downloaded file - completed
 - check for curruptions and handle errors
 - ** design the protocol for efficient transfer
 - handle dishonest parties - call splitFire again to hadle missing parts
@@ -40,7 +40,7 @@ def getIPAddress():
     return ip_addr
 
 
-# NOTE: This is robust, but address reuser issue is bothering.  Also, implemen
+# NOTE: This is robust, but address reuse issue is bothering.  Also, implemen
 class FileServerHandler:
     """ File Server Handler, using subprocess calls
     Usage:

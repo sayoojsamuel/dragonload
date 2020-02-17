@@ -3,4 +3,5 @@
 .vscode
 **/*.mp4.*
 **/*.mp4
+__pycache__
 

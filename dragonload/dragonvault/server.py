@@ -9,7 +9,7 @@ class User:
     # Do we require user state?
     # register log time
 
-    def __init__(self, ip_addr, userName=None):
+    def __init__(self, ip_addr=None, userName=None):
         if userName == None:
             userName = "- anonymous -"
         self.userName = userName
@@ -26,17 +26,35 @@ class User:
             + room \
             + "\n)"
 
+
     def getName(self):
+        """ Returns the Username """
         return userName
+
 
     def updateName(self, newName):
         self.userName = newName
 
+
     def currentRoom(self):
         return self.room
 
+
     def joinRoom(self, roomObject):
+        """ Join the specified Room.
+
+        Arguments:
+        roomObject: object of class Room
+
+        Return:
+        None <- Unsuccessful
+        roomObject<- Successfull
+        """
         if not isinstance(roomObject, Room):
+            # Format string %s is error; FIXME later
+            logger.error(
+                "User %s cannot join Room: %s is not a valid Room object" % (self.userName, roomObject)
+            )
             return None
         self.room = roomObject
         logger.info(
@@ -44,9 +62,19 @@ class User:
         )
         return self.room
 
+
     # FIX: Debug a 1000 times. This might not be a good implementation
     # The state of the room may vary
-    def leaveRoom(self, roomObject):
+    def leaveRoom(self, roomObject: Room) -> bool:
+        """ Leave the specified room.
+
+        Arguments:
+        roomObject: object of class Room
+
+        Return:
+        True <- Successfully exited Room roomObject
+        False <- Unable to leave the Room roomObject
+        """
         if self.room == roomObject:
             self.room = None
             logger.info(
@@ -81,6 +109,7 @@ class Room:
         self.status = Room.ONLINE
         self.status_message = Room.statusCodes[self.status]
 
+
     # FIX: Not usefull and cannot trust the garbage collector
     def __del__(self):
         """Release all the users, and kill the room
@@ -93,6 +122,7 @@ class Room:
         logger.info(
             "Successfully deleted room %s" % self.roomName
         )
+
 
     def __repr__(self):
         name = "\tRoomName: %s,\n" %(self.roomName)
@@ -107,9 +137,11 @@ class Room:
             + users \
             + "\n)"
 
+
     def __str__(self):
         return "Room(name: %s)" %(self.roomName)
        
+
     def changeStatus(self, statusCode):
         """Change the status of the Room to statusCode
 
@@ -163,6 +195,7 @@ class Room:
 
         return True
 
+
     def removeUser(self, user):
         """Remove user from the Room. Also update the User.room
 
@@ -209,6 +242,8 @@ class Room:
 
 
     # delete all users in the active users list
+    # FATAL: FIXME: FIXME: This cannot be a classmethod - were you sleeping while coding???
+    # Change it to static method and pass the object room.
     @classmethod
     def terminateRoom(cls):
         """Force quit the users from the room

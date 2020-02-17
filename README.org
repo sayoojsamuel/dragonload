@@ -2,10 +2,10 @@
 
 * dragonload Distributed Downlaod Manager
 ** Tasks
-[ ] Design a robust backend
-[ ] Manage the protocol
-[ ] Test the platform
-[ ] Try to convert the commands to python only; platform independance
+- [-] Design a robust backend
+- [ ] Manage the protocol
+- [ ] Test the platform
+- [ ] Try to convert the commands to python only; platform independance
 ** Tesing
 [ ] Check for partial download;
 ** Protocol
