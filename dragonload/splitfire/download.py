@@ -142,7 +142,8 @@ def downloadPart(url: str, start: int, end: int, filename: str) -> (bool, str):
 
 
 class Test():
-    testFileURL="https://fgig.ir/movie/2019/Aladdin-2019_480.mp4"
+    #testFileURL="https://fgig.ir/movie/2019/Aladdin-2019_480.mp4"
+    testFileURL = "http://9092.ultratv100.com:9090/movies/Batch219/47%20Ronin%20%282013%29/47%20Ronin%20%282013%29.mp4"
     status, fileSize = checkAcceptRange(testFileURL)
     out = partitionManager(testFileURL, fileSize, 100)
     #if status:

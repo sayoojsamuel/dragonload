@@ -3,11 +3,18 @@
 * dragonload Distributed Downlaod Manager
 ** Tasks
 - [-] Design a robust backend
-- [ ] Manage the protocol
+- [-] Manage the protocol
+- [ ] Create a config directory in POSIX and MAC machines. This about NS
+  machines later. Config directory is necessary to store the db and the config
+  file. DB is necessary for the downloading to happen. Also fix the directory
+  where the downloading happens. Parital downloads in the temp directory or the
+  main download directory. 
 - [ ] Test the platform
 - [ ] Try to convert the commands to python only; platform independance
+
 ** Tesing
-[ ] Check for partial download;
+- [-] Check for partial download
+- [ ] Test the merge functionality
 ** Protocol
 *** Splitfire Protocol
 This protocol is responsible for managing all the interested parties into one
@@ -33,7 +40,7 @@ the decorated users.
 - Share files parallely, efficiently and equally among the users. (check for
   corruptions)
 - Test if local hosting is proper
-- Share in a binary Tree manner
+- Share in a binary Tree manner - Will it work out?
 - Merge the parts as and when they arrive. Notify other about the status of the
   proces
 
@@ -46,10 +53,13 @@ manager.  This can be implemented in two ways:
 *** [ ] Simustaneous running of Splitfile and ChainRain in pipeline
 *** [ ] Add MultiThreaded Download for individual parts
 *** [ ] Authenticated Private Rooms
-*** [ ] curses based application
+*** [X] curses based application
 *** [ ] Use click and pyinquirer, prompt-toolkit
 *** [ ] Use grpc for client, server, and all comms
 ***** [ ] Create robust framework, and build curses app, web app on top
 
 ** Necessary Reads
 *** [[https://medium.com/@ageitgey/python-3-quick-tip-the-easy-way-to-deal-with-file-paths-on-windows-mac-and-linux-11a072b58d5f][Pathlib]]: Article to make os independent paths
+** ISSUES:
+- [ ] Fix the port issue. Update the server with the users port address in
+  addition to the IP address.  Code everything in __main__ file.
