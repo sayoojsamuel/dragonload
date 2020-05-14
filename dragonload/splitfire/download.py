@@ -76,36 +76,6 @@ def checkDownloadDirectory(path: str=HOME) -> bool:
     return True
 
 
-def partitionManager(url: str, fileSize: int, user_count: int) -> bool:
-    """Returns the segmentRanges for the partitions.
-
-    This is supposed to be a multiple of activeParties
-    - Manages File Names
-    - Defines Byte Ranges
-    - Divides Download Tasks among Parties
-    """
-    checkDownloadDirectory(HOME)
-
-    filename = url.split('/')[-1]
-    total_partitions = TRESHOLD * user_count
-
-    byteRanges = calculateByteRange(fileSize, total_partitions)
-    downloadStatus = list()
-    # InitiateDownload
-    for counter, (start, end) in enumerate(byteRanges):
-        # Each partition is specified by three digit representation
-        partitionFilename = filename + ".part" + (str(counter).rjust(3, '0'))
-        status, successFile = downloadPart(url, start, end, partitionFilename)
-        if not status:
-            logger.fatal('Download Failed for %s; retrying now' % partitionFilename)
-            status, successFile = downloadPart(url, start, end, partitionFilename)
-        downloadStatus.append((status, successFile))
-    statusList, _ = zip(*downloadStatus)
-    if all(status == True for status in statusList):
-        logger.info("splitfire Successfull")
-    return True
-
-
 def downloadPart(url: str, start: int, end: int, filename: str) -> (bool, str):
     """Returns statusCode
 
@@ -139,6 +109,37 @@ def downloadPart(url: str, start: int, end: int, filename: str) -> (bool, str):
         fp.write(r.content)
     """
     #return True
+    pass
+
+
+def partitionManager(url: str, fileSize: int, user_count: int) -> bool:
+    """Returns the segmentRanges for the partitions.
+
+    This is supposed to be a multiple of activeParties
+    - Manages File Names
+    - Defines Byte Ranges
+    - Divides Download Tasks among Parties
+    """
+    checkDownloadDirectory(HOME)
+
+    filename = url.split('/')[-1]
+    total_partitions = TRESHOLD * user_count
+
+    byteRanges = calculateByteRange(fileSize, total_partitions)
+    downloadStatus = list()
+    # InitiateDownload
+    for counter, (start, end) in enumerate(byteRanges):
+        # Each partition is specified by three digit representation
+        partitionFilename = filename + ".part" + (str(counter).rjust(3, '0'))
+        status, successFile = downloadPart(url, start, end, partitionFilename)
+        if not status:
+            logger.fatal('Download Failed for %s; retrying now' % partitionFilename)
+            status, successFile = downloadPart(url, start, end, partitionFilename)
+        downloadStatus.append((status, successFile))
+    statusList, _ = zip(*downloadStatus)
+    if all(status == True for status in statusList):
+        logger.info("splitfire Successfull")
+    return True
 
 
 class Test():

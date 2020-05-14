@@ -33,5 +33,14 @@ class FileServer:
             logger.error("Unable to terminate the File Server: %s" % err)
 
 
-fs = FileServer()
-fs.run()
+## This script is disigned to be invoked as a non blocking subprocess call.
+## Please note that the following acts as the main function
+## TODO: Refactor the code to use non-blocking threading
+if __name__ == "__main__":
+    """
+    Usage:
+    To start the server: python httpServer.py
+    To kill the server: C-d (SIGTERM)
+    """
+    fs = FileServer()
+    fs.run()

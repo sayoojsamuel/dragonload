@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+message Empty {
+   
+}
+
+message User {
+    string userName = 1;
+    string ip_addr = 2;
+}
+
+message Room {
+    string roomName = 1;
+    int32 activeUserCount = 2;
+    repeated User activeUsers = 3;
+    int32 status = 4;
+    string status_message = 5;
+}
+
+message Url {
+    string url = 1;
+}
+
+message Ack {
+    string msg = 1;
+}
+
+service Dragonvault {
+    // An RPC designed to aid the server dragonvault.
+    //
+    // Objective to transfer User, Room details loaded in the server.
+    // Includes features for List, Create or Join room.
+
+    // List the rooms currently recorded in the Server
+    rpc ListRooms(Empty) returns (stream Room);
+
+    // Join a specific room from the rooms list
+    // FIX: Return Ack or return Room?
+    rpc JoinRoom(Room) returns (Ack);
+
+    // Create a new room and add to the list
+    // FIX: Return Ack or return Room?
+    rpc CreateRoom(Room) returns (Ack);
+
+    // Optional but needed feature to get room details
+    rpc InfoRoom(Room) returns (Room);
+
+    // The next level of functions define operations inside a room.
+    // Includes features to submit URL, Start Download, etc...
+
+    // Submit URL
+    rpc SubmitUrl(Url) returns (Ack);
+
+    // Start Download when everyone is ready
+    //
+    // ReDo this whole part again.  Split it protocol wise.
+    rpc StartDownload(Empty) returns (Ack);
+
+
+
+
+}

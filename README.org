@@ -60,6 +60,8 @@ manager.  This can be implemented in two ways:
 
 ** Necessary Reads
 *** [[https://medium.com/@ageitgey/python-3-quick-tip-the-easy-way-to-deal-with-file-paths-on-windows-mac-and-linux-11a072b58d5f][Pathlib]]: Article to make os independent paths
+*** [[https://github.com/jwlodek/py_cui][py_cui:]] alternative to ncurses
+
 ** ISSUES:
 - [ ] Fix the port issue. Update the server with the users port address in
   addition to the IP address.  Code everything in __main__ file.

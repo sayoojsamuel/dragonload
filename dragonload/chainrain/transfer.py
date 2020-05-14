@@ -40,9 +40,11 @@ def getIPAddress():
     return ip_addr
 
 
-# NOTE: This is robust, but address reuse issue is bothering.  Also, implemen
+# NOTE: This is robust, but address reuse issue is bothering.
+# Refactor the code to use non-blocking threads in future.
 class FileServerHandler:
-    """ File Server Handler, using subprocess calls
+    """
+    File Server Handler, using subprocess calls
     Usage:
         FileServerHandler.start() # To start the server
         FileServerHandler.stop() # To stop the server
@@ -66,7 +68,7 @@ class FileServerHandler:
 
 # FIXME: hostPort
 def getPart(partNumber: int, hostIP: str) -> (bool, str):
-   # determine the filename
+   # TODO: determine the filename
    # FIX: Database?
    filename = None
    hostPort = None # ?? from config file
