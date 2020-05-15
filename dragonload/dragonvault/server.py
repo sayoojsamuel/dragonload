@@ -39,6 +39,7 @@ class DragonvaultServicer(dragonvault_pb2_grpc.DragonvaultServicer):
         user = decodeUser(request)
         # NOTE: Fix me in next iteration.  add me to database instead.
         userList.append(user)
+        logger.info("User Added- {} : {}".format(user.userName, user.ip_addr))
         return dragonvault_pb2.Ack(status=True, msg="User logged successfully")
    
 
@@ -59,7 +60,7 @@ class DragonvaultServicer(dragonvault_pb2_grpc.DragonvaultServicer):
                 _live_room = _room
                 break
 
-        if not eflag:
+        if not _live_room:
             # Room does not exist, reply with apt Ack
             return dragonvault_pb2.Ack(status=False, msg="Invalid Room! Do you want to create a new room?")
 
@@ -83,6 +84,7 @@ class DragonvaultServicer(dragonvault_pb2_grpc.DragonvaultServicer):
 
         # Create a new room
         roomList.append(room)
+        logger.info("Room Created- {} ".format(room.roomName))
         return dragonvault_pb2.Ack(status = True, msg="Room created Successfully")
     
 
