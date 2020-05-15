@@ -12,53 +12,17 @@ from dragonload.dragonvault.actors import User, Room
 import dragonvault_pb2
 import dragonvault_pb2_grpc
 
+# import utilities, encode, decode functions
+from dragonload.dragonvault.util import (
+    encodeUser,
+    decodeUser,
+    encodeRoom,
+    decodeRoom
+)
+
 # create the global User List, Room List
 userList = []
 roomList = []
-
-# Encode/Decode functions
-"""
-Functions designed to translate betwenn grpc class and actor classes
-Encode(actor_class) -> grpc_class
-Decode(grpc_class) -> actor_class
-"""
-def encodeUser(user: User) -> dragonvault_pb2.User:
-    encoded_user = dragonvault_pb2.User()
-    encoded_user.userName = user.userName
-    encoded_user.ip_addr = user.ip_addr
-    if user.room != None:
-        encoded_user.room = encodeRoom(user.room)
-    return encoded_user
-
-def decodeUser(user: dragonvault_pb2.User) -> User:
-    decoded_user = User(user.userName, user.ip_addr)
-    if user.HasField('room'):
-        decoded_user.room = decodeRoom(user.room)
-    return decoded_user
-
-def encodeRoom(room: Room) -> dragonvault_pb2.Room:
-    encoded_room = dragonvault_pb2.Room()
-    encoded_room.roomName = room.roomName
-    encoded_room.activeUserCount = room.activeUserCount
-    if room.activeUsers != list():
-        encoded_room.activeUsers = list(map(encodeUser, room.activeUsers))
-    encoded_room.status = room.status
-    encoded_room.status_message = room.status_message
-    return encoded_room
-
-def decodeRoom(room: dragonvault_pb2.Room) -> Room:
-    decoded_room = Room(room.roomName)
-    if room.HasField('activeUserCount'):
-        decoded_room.activeUserCount = room.activeUserCount
-    if room.HasField('activeUsers'):
-        decoded_room.activeUsers = list(map(decodeUser, room.activeUsers))
-    if room.HasField('status'):
-        decoded_room.status = room.status
-    if room.HasField('status_message'):
-        decoded_room.status_message = room.status_message
-    return decoded_room
-
-   
 
 
 # Class to define server functions, derived from the

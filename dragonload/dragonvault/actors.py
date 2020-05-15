@@ -3,6 +3,9 @@
 from copy import deepcopy
 from dragonload.util.logging import logger
 
+# NOTE: Updated User class no longer support room object.
+# Feature changed to support just the room name
+# Update still in progress
 
 class User:
 
