@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\x11\x64ragonvault.proto\"\x07\n\x05\x45mpty\")\n\x04User\x12\x10\n\x08userName\x18\x01 \x01(\t\x12\x0f\n\x07ip_addr\x18\x02 \x01(\t\"u\n\x04Room\x12\x10\n\x08roomName\x18\x01 \x01(\t\x12\x17\n\x0f\x61\x63tiveUserCount\x18\x02 \x01(\x05\x12\x1a\n\x0b\x61\x63tiveUsers\x18\x03 \x03(\x0b\x32\x05.User\x12\x0e\n\x06status\x18\x04 \x01(\x05\x12\x16\n\x0estatus_message\x18\x05 \x01(\t\"\x12\n\x03Url\x12\x0b\n\x03url\x18\x01 \x01(\t\"\x12\n\x03\x41\x63k\x12\x0b\n\x03msg\x18\x01 \x01(\t2\xb1\x01\n\x0b\x44ragonvault\x12\x1c\n\tListRooms\x12\x06.Empty\x1a\x05.Room0\x01\x12\x17\n\x08JoinRoom\x12\x05.Room\x1a\x04.Ack\x12\x19\n\nCreateRoom\x12\x05.Room\x1a\x04.Ack\x12\x18\n\x08InfoRoom\x12\x05.Room\x1a\x05.Room\x12\x17\n\tSubmitUrl\x12\x04.Url\x1a\x04.Ack\x12\x1d\n\rStartDownload\x12\x06.Empty\x1a\x04.Ackb\x06proto3'
+  serialized_pb=b'\n\x11\x64ragonvault.proto\"\x07\n\x05\x45mpty\">\n\x04User\x12\x10\n\x08userName\x18\x01 \x01(\t\x12\x0f\n\x07ip_addr\x18\x02 \x01(\t\x12\x13\n\x04room\x18\x03 \x01(\x0b\x32\x05.Room\"u\n\x04Room\x12\x10\n\x08roomName\x18\x01 \x01(\t\x12\x17\n\x0f\x61\x63tiveUserCount\x18\x02 \x01(\x05\x12\x1a\n\x0b\x61\x63tiveUsers\x18\x03 \x03(\x0b\x32\x05.User\x12\x0e\n\x06status\x18\x04 \x01(\x05\x12\x16\n\x0estatus_message\x18\x05 \x01(\t\"4\n\x08UserRoom\x12\x13\n\x04user\x18\x01 \x01(\x0b\x32\x05.User\x12\x13\n\x04room\x18\x02 \x01(\x0b\x32\x05.Room\"\x12\n\x03Url\x12\x0b\n\x03url\x18\x01 \x01(\t\"\"\n\x03\x41\x63k\x12\x0e\n\x06status\x18\x01 \x01(\x08\x12\x0b\n\x03msg\x18\x02 \x01(\t2\xcd\x01\n\x0b\x44ragonvault\x12\x16\n\x07LogUser\x12\x05.User\x1a\x04.Ack\x12\x1c\n\tListRooms\x12\x06.Empty\x1a\x05.Room0\x01\x12\x1b\n\x08JoinRoom\x12\t.UserRoom\x1a\x04.Ack\x12\x19\n\nCreateRoom\x12\x05.Room\x1a\x04.Ack\x12\x18\n\x08InfoRoom\x12\x05.Room\x1a\x05.Room\x12\x17\n\tSubmitUrl\x12\x04.Url\x1a\x04.Ack\x12\x1d\n\rStartDownload\x12\x06.Empty\x1a\x04.Ackb\x06proto3'
 )
 
 
@@ -69,6 +69,13 @@ _USER = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='room', full_name='User.room', index=2,
+      number=3, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -82,7 +89,7 @@ _USER = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=30,
-  serialized_end=71,
+  serialized_end=92,
 )
 
 
@@ -140,8 +147,46 @@ _ROOM = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=73,
-  serialized_end=190,
+  serialized_start=94,
+  serialized_end=211,
+)
+
+
+_USERROOM = _descriptor.Descriptor(
+  name='UserRoom',
+  full_name='UserRoom',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='user', full_name='UserRoom.user', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='room', full_name='UserRoom.room', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=213,
+  serialized_end=265,
 )
 
 
@@ -171,8 +216,8 @@ _URL = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=192,
-  serialized_end=210,
+  serialized_start=267,
+  serialized_end=285,
 )
 
 
@@ -184,8 +229,15 @@ _ACK = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='msg', full_name='Ack.msg', index=0,
-      number=1, type=9, cpp_type=9, label=1,
+      name='status', full_name='Ack.status', index=0,
+      number=1, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='msg', full_name='Ack.msg', index=1,
+      number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -202,14 +254,18 @@ _ACK = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=212,
-  serialized_end=230,
+  serialized_start=287,
+  serialized_end=321,
 )
 
+_USER.fields_by_name['room'].message_type = _ROOM
 _ROOM.fields_by_name['activeUsers'].message_type = _USER
+_USERROOM.fields_by_name['user'].message_type = _USER
+_USERROOM.fields_by_name['room'].message_type = _ROOM
 DESCRIPTOR.message_types_by_name['Empty'] = _EMPTY
 DESCRIPTOR.message_types_by_name['User'] = _USER
 DESCRIPTOR.message_types_by_name['Room'] = _ROOM
+DESCRIPTOR.message_types_by_name['UserRoom'] = _USERROOM
 DESCRIPTOR.message_types_by_name['Url'] = _URL
 DESCRIPTOR.message_types_by_name['Ack'] = _ACK
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
@@ -235,6 +291,13 @@ Room = _reflection.GeneratedProtocolMessageType('Room', (_message.Message,), {
   })
 _sym_db.RegisterMessage(Room)
 
+UserRoom = _reflection.GeneratedProtocolMessageType('UserRoom', (_message.Message,), {
+  'DESCRIPTOR' : _USERROOM,
+  '__module__' : 'dragonvault_pb2'
+  # @@protoc_insertion_point(class_scope:UserRoom)
+  })
+_sym_db.RegisterMessage(UserRoom)
+
 Url = _reflection.GeneratedProtocolMessageType('Url', (_message.Message,), {
   'DESCRIPTOR' : _URL,
   '__module__' : 'dragonvault_pb2'
@@ -257,13 +320,22 @@ _DRAGONVAULT = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=233,
-  serialized_end=410,
+  serialized_start=324,
+  serialized_end=529,
   methods=[
+  _descriptor.MethodDescriptor(
+    name='LogUser',
+    full_name='Dragonvault.LogUser',
+    index=0,
+    containing_service=None,
+    input_type=_USER,
+    output_type=_ACK,
+    serialized_options=None,
+  ),
   _descriptor.MethodDescriptor(
     name='ListRooms',
     full_name='Dragonvault.ListRooms',
-    index=0,
+    index=1,
     containing_service=None,
     input_type=_EMPTY,
     output_type=_ROOM,
@@ -272,16 +344,16 @@ _DRAGONVAULT = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='JoinRoom',
     full_name='Dragonvault.JoinRoom',
-    index=1,
+    index=2,
     containing_service=None,
-    input_type=_ROOM,
+    input_type=_USERROOM,
     output_type=_ACK,
     serialized_options=None,
   ),
   _descriptor.MethodDescriptor(
     name='CreateRoom',
     full_name='Dragonvault.CreateRoom',
-    index=2,
+    index=3,
     containing_service=None,
     input_type=_ROOM,
     output_type=_ACK,
@@ -290,7 +362,7 @@ _DRAGONVAULT = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='InfoRoom',
     full_name='Dragonvault.InfoRoom',
-    index=3,
+    index=4,
     containing_service=None,
     input_type=_ROOM,
     output_type=_ROOM,
@@ -299,7 +371,7 @@ _DRAGONVAULT = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='SubmitUrl',
     full_name='Dragonvault.SubmitUrl',
-    index=4,
+    index=5,
     containing_service=None,
     input_type=_URL,
     output_type=_ACK,
@@ -308,7 +380,7 @@ _DRAGONVAULT = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='StartDownload',
     full_name='Dragonvault.StartDownload',
-    index=5,
+    index=6,
     containing_service=None,
     input_type=_EMPTY,
     output_type=_ACK,

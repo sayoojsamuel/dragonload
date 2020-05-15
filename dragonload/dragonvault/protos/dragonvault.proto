@@ -7,6 +7,7 @@ message Empty {
 message User {
     string userName = 1;
     string ip_addr = 2;
+    Room room = 3;
 }
 
 message Room {
@@ -17,13 +18,20 @@ message Room {
     string status_message = 5;
 }
 
+message UserRoom {
+    User user = 1;
+    Room room = 2;
+}
+
 message Url {
     string url = 1;
 }
 
 message Ack {
-    string msg = 1;
+    bool status = 1;
+    string msg = 2;
 }
+
 
 service Dragonvault {
     // An RPC designed to aid the server dragonvault.
@@ -31,12 +39,15 @@ service Dragonvault {
     // Objective to transfer User, Room details loaded in the server.
     // Includes features for List, Create or Join room.
 
+    // Log active user
+    rpc LogUser(User) returns (Ack);
+
     // List the rooms currently recorded in the Server
     rpc ListRooms(Empty) returns (stream Room);
 
     // Join a specific room from the rooms list
     // FIX: Return Ack or return Room?
-    rpc JoinRoom(Room) returns (Ack);
+    rpc JoinRoom(UserRoom) returns (Ack);
 
     // Create a new room and add to the list
     // FIX: Return Ack or return Room?

@@ -17,6 +17,11 @@ class DragonvaultStub(object):
         Args:
             channel: A grpc.Channel.
         """
+        self.LogUser = channel.unary_unary(
+                '/Dragonvault/LogUser',
+                request_serializer=dragonvault__pb2.User.SerializeToString,
+                response_deserializer=dragonvault__pb2.Ack.FromString,
+                )
         self.ListRooms = channel.unary_stream(
                 '/Dragonvault/ListRooms',
                 request_serializer=dragonvault__pb2.Empty.SerializeToString,
@@ -24,7 +29,7 @@ class DragonvaultStub(object):
                 )
         self.JoinRoom = channel.unary_unary(
                 '/Dragonvault/JoinRoom',
-                request_serializer=dragonvault__pb2.Room.SerializeToString,
+                request_serializer=dragonvault__pb2.UserRoom.SerializeToString,
                 response_deserializer=dragonvault__pb2.Ack.FromString,
                 )
         self.CreateRoom = channel.unary_unary(
@@ -55,6 +60,13 @@ class DragonvaultServicer(object):
     Objective to transfer User, Room details loaded in the server.
     Includes features for List, Create or Join room.
     """
+
+    def LogUser(self, request, context):
+        """Log active user
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
     def ListRooms(self, request, context):
         """List the rooms currently recorded in the Server
@@ -108,6 +120,11 @@ class DragonvaultServicer(object):
 
 def add_DragonvaultServicer_to_server(servicer, server):
     rpc_method_handlers = {
+            'LogUser': grpc.unary_unary_rpc_method_handler(
+                    servicer.LogUser,
+                    request_deserializer=dragonvault__pb2.User.FromString,
+                    response_serializer=dragonvault__pb2.Ack.SerializeToString,
+            ),
             'ListRooms': grpc.unary_stream_rpc_method_handler(
                     servicer.ListRooms,
                     request_deserializer=dragonvault__pb2.Empty.FromString,
@@ -115,7 +132,7 @@ def add_DragonvaultServicer_to_server(servicer, server):
             ),
             'JoinRoom': grpc.unary_unary_rpc_method_handler(
                     servicer.JoinRoom,
-                    request_deserializer=dragonvault__pb2.Room.FromString,
+                    request_deserializer=dragonvault__pb2.UserRoom.FromString,
                     response_serializer=dragonvault__pb2.Ack.SerializeToString,
             ),
             'CreateRoom': grpc.unary_unary_rpc_method_handler(
@@ -153,6 +170,22 @@ class Dragonvault(object):
     """
 
     @staticmethod
+    def LogUser(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/Dragonvault/LogUser',
+            dragonvault__pb2.User.SerializeToString,
+            dragonvault__pb2.Ack.FromString,
+            options, channel_credentials,
+            call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
     def ListRooms(request,
             target,
             options=(),
@@ -179,7 +212,7 @@ class Dragonvault(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/Dragonvault/JoinRoom',
-            dragonvault__pb2.Room.SerializeToString,
+            dragonvault__pb2.UserRoom.SerializeToString,
             dragonvault__pb2.Ack.FromString,
             options, channel_credentials,
             call_credentials, compression, wait_for_ready, timeout, metadata)

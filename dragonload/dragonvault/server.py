@@ -1,293 +1,161 @@
 #!/usr/bin/env python3
 
-from copy import deepcopy
+import grpc
+from concurrent import futures
+import time
+
+# import logger and actors
 from dragonload.util.logging import logger
+from dragonload.dragonvault.actors import User, Room
+
+# imprort grpc Class files
+import dragonvault_pb2
+import dragonvault_pb2_grpc
+
+# create the global User List, Room List
+userList = []
+roomList = []
+
+# Encode/Decode functions
+"""
+Functions designed to translate betwenn grpc class and actor classes
+Encode(actor_class) -> grpc_class
+Decode(grpc_class) -> actor_class
+"""
+def encodeUser(user: User) -> dragonvault_pb2.User:
+    encoded_user = dragonvault_pb2.User()
+    encoded_user.userName = user.userName
+    encoded_user.ip_addr = user.ip_addr
+    if user.room != None:
+        encoded_user.room = encodeRoom(user.room)
+    return encoded_user
+
+def decodeUser(user: dragonvault_pb2.User) -> User:
+    decoded_user = User(user.userName, user.ip_addr)
+    if user.HasField('room'):
+        decoded_user.room = decodeRoom(user.room)
+    return decoded_user
+
+def encodeRoom(room: Room) -> dragonvault_pb2.Room:
+    encoded_room = dragonvault_pb2.Room()
+    encoded_room.roomName = room.roomName
+    encoded_room.activeUserCount = room.activeUserCount
+    if room.activeUsers != list():
+        encoded_room.activeUsers = list(map(encodeUser, room.activeUsers))
+    encoded_room.status = room.status
+    encoded_room.status_message = room.status_message
+    return encoded_room
+
+def decodeRoom(room: dragonvault_pb2.Room) -> Room:
+    decoded_room = Room(room.roomName)
+    if room.HasField('activeUserCount'):
+        decoded_room.activeUserCount = room.activeUserCount
+    if room.HasField('activeUsers'):
+        decoded_room.activeUsers = list(map(decodeUser, room.activeUsers))
+    if room.HasField('status'):
+        decoded_room.status = room.status
+    if room.HasField('status_message'):
+        decoded_room.status_message = room.status_message
+    return decoded_room
+
+   
 
 
-class User:
+# Class to define server functions, derived from the
+# dragonvault_pb2.grpc.DragonvaultServicer
+class DragonvaultServicer(dragonvault_pb2_grpc.DragonvaultServicer):
 
-    # Do we require user state?
-    # register log time
-    # Do we still require port number?
+    """
+    Perform the functions here;
+    Just the wrappers for the functions that needs to be performed;
+    Actuals functions defined miles away
+    """
 
-    def __init__(self, ip_addr, userName=None):
-        if userName == None:
-            userName = "- anonymous -"
-        self.userName = userName
-        self.ip_addr = ip_addr
-        self.room = None
+    def LogUser(self, request, context):
+        user = decodeUser(request)
+        # NOTE: Fix me in next iteration.  add me to database instead.
+        userList.append(user)
+        return dragonvault_pb2.Ack(status=True, msg="User logged successfully")
+   
 
+    def ListRooms(self, request: dragonvault_pb2.Empty, context) -> dragonvault_pb2.Room:
+        for room in roomList:
+            room = encodeRoom(room)
+            yield room
 
-    def __repr__(self):
-        name = "\tUser Name: %s,\n" %(self.userName)
-        ip_addr = "\tIP Addr: %s,\n" %(self.ip_addr)
-        room = "\tRoom Enrolled: %s,\n" %(self.room)
+    def JoinRoom(self, request: dragonvault_pb2.UserRoom, context):
+        user = decodeUser(request.user)
+        room = decodeRoom(request.room)
 
-        return "User(\n" \
-            + name \
-            + ip_addr \
-            + room \
-            + "\n)"
+        # Check validity
+        _live_room = None
+        for _room in roomList:
+            if _room.roomName == room.roomName:
+                # room Exist inside roomList
+                _live_room = _room
+                break
 
+        if not eflag:
+            # Room does not exist, reply with apt Ack
+            return dragonvault_pb2.Ack(status=False, msg="Invalid Room! Do you want to create a new room?")
 
-    def getName(self):
-        """ Returns the Username """
-        return userName
+        status = Room.addUser(_live_room, user)
+        if not status:
+            # unable to add user
+            msg = "Unable to add user to the Room"
+        else:
+            msg = "User added successfully to Room -" + room.roomName
 
+        return dragonvault_pb2.Ack(status = status, msg=msg)
+   
+    def CreateRoom(self, request, context):
+        room = decodeRoom(request)
 
-    def updateName(self, newName):
-        self.userName = newName
+        # Check conflicting names
+        for _room in roomList:
+            if _room.roomName == room.roomName:
+                # Room already exist
+                return dragonvault_pb2.Ack(status=False, msg="Another room with name '{}' already exist".format(room.roomName))
 
+        # Create a new room
+        roomList.append(room)
+        return dragonvault_pb2.Ack(status = True, msg="Room created Successfully")
+    
 
-    def getIPAddress(self):
-        """ Returns the IP Address """
-        return self.ip_addr
+    def InfoRoom(self, request, context):
+        room = decodeRoom(request)
 
-    def setIPAddress(self):
-        """ Cannot reset ip_address """
-        return False
+        # search in roomList, default None Room
+        _live_room = dragonvault_pb2.Room('')
+        for _room in roomList:
+            if _room.roomName == room.roomName:
+                _live_room = _room
+                break
+            
+        return _live_room
 
-    def currentRoom(self):
-        return self.room
+    def SubmitUrl(self, request, context):
+        pass
 
+    def StartDownload(self, request, context):
+        pass
 
-    def joinRoom(self, roomObject):
-        """ Join the specified Room.
+# Initialize gRPC server
+server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
 
-        Arguments:
-        roomObject: object of class Room
+# Add DragonvaultServicer to function
+dragonvault_pb2_grpc.add_DragonvaultServicer_to_server(
+    DragonvaultServicer(),
+    server
+)
 
-        Return:
-        None <- Unsuccessful
-        roomObject<- Successfull
-        """
-        if not isinstance(roomObject, Room):
-            # Format string %s is error; FIXME later
-            logger.error(
-                "User %s cannot join Room: %s is not a valid Room object" % (self.userName, roomObject)
-            )
-            return None
-        self.room = roomObject
-        logger.info(
-            "User %s joined room %s" %(self.userName, roomObject.roomName)
-        )
-        return self.room
+logger.info("Starting dragonvault server, Listening on port 50051...")
+server.add_insecure_port('[::]:50051')
+server.start()
 
-
-    # FIX: Debug a 1000 times. This might not be a good implementation
-    # The state of the room may vary
-    def leaveRoom(self, roomObject) -> bool:
-        """ Leave the specified room.
-
-        Arguments:
-        roomObject: object of class Room
-
-        Return:
-        True <- Successfully exited Room roomObject
-        False <- Unable to leave the Room roomObject
-        """
-        if self.room == roomObject:
-            self.room = None
-            logger.info(
-                "User %s exited room %s" %(self.userName, roomObject.roomName)
-            )
-            return True
-
-        logger.error(
-            "User %s unable to exit room %s" %(self.userName, roomObject.roomName)
-        )
-        return False
-
-
-class Room:
-
-    OFFLINE = 1
-    ONLINE = 2
-    IN_SPLITFIRE = 3
-    IN_CHAINRAIN = 4
-
-    statusCodes = {
-        OFFLINE: "Room Offline",
-        ONLINE: "Room Online, active",
-        IN_SPLITFIRE: "Splitfire Protocol in progress",
-        IN_CHAINRAIN: "Chainrain Protocol in progress"
-    }
-
-    def __init__(self, roomName):
-        self.roomName = roomName
-        self.activeUserCount = 0
-        self.activeUsers = list()
-        self.status = Room.ONLINE
-        self.status_message = Room.statusCodes[self.status]
-
-
-    # FIX: Not usefull and cannot trust the garbage collector
-    def __del__(self):
-        """Release all the users, and kill the room
-
-        Currently not clearing the Room.activeUsers (just deleting object clears the air)
-        """
-        for user in self.activeUsers:
-            user.leaveRoom(self)
-
-        logger.info(
-            "Successfully deleted room %s" % self.roomName
-        )
-
-
-    def __repr__(self):
-        name = "\tRoomName: %s,\n" %(self.roomName)
-        status = "\tRoom Status: %s,\n" %(self.status_message)
-        userCount = "\tUser Count: %d,\n" %(self.activeUserCount)
-        users = "\tUsers in Room\n\t\t" + "\n\t\t".join(self.getActiveUsers())
-
-        return "Room(\n" \
-            + name \
-            + status \
-            + userCount \
-            + users \
-            + "\n)"
-
-
-    def __str__(self):
-        return "Room(name: %s)" %(self.roomName)
-       
-
-    def changeStatus(self, statusCode):
-        """Change the status of the Room to statusCode
-
-        Returns:
-           True <- if successfull
-           False <- if unsuccessfull
-        """
-        backup_status = self.status
-        try:
-            self.status = statusCode
-            self.status_message = Room.statusCodes[self.status]
-            logger.info("Room %s switched to status: %s " %(self.roomName, self.status))
-        except Exception as err:
-            logger.error(
-                "Error changing room %s status from %s to %s ;; %s"\
-                %(self.roomName, backup_status, statusCode, err)
-            )
-            self.status = backup_status
-            self.status_message = Room.statusCodes[self.status]
-            return False
-        return True
-
-
-    def addUser(self, user):
-        """Adds a user to the Room. Also updates the User.room
-       
-        Returns:
-            True <- If task successfull
-            Fasle <- if unable to add user
-        """
-        if user.currentRoom() != None:
-            logger.error(
-                "User %s is already in room %s" %(user.userName, user.room)
-            )
-            return False
-
-        back_self_user = self.activeUsers[:]
-        back_self_count = self.activeUserCount
-
-        try:
-            self.activeUsers.append(user)
-            self.activeUserCount += 1
-            back_room = user.joinRoom(self)
-        except Exception as err:
-            logger.error(
-                "Error adding user %s to room %s" % (user.userName, self.roomName)
-            )
-            self.activeUsers = back_self_user
-            self.activeUserCount = back_self_count
-            return False
-
-        return True
-
-
-    def removeUser(self, user):
-        """Remove user from the Room. Also update the User.room
-
-        Returns:
-            True <- If task successfull
-            Fasle <- if unable to add user
-        """
-        if user not in self.activeUsers:
-            logger.error(
-                "Unable to remove user %s; user not in room %s"\
-                %(user.userName, self.roomName)
-            )
-            return False
-
-        back_self_user = self.activeUsers[:]
-        back_self_count = self.activeUserCount
-        try:
-            self.activeUsers.remove(user)
-            self.activeUserCount -=1
-            user.leaveRoom(self) # returns bool value
-        except Exception as err:
-            logger.error(
-                "Unable to remove user %s; %s"\
-                %(user.userName, err)
-            )
-            self.activeUsers = back_self_user
-            self.activeUserCount = back_self_count
-            return False
-
-        return True
-
-
-    def getActiveUsers(self):
-        """Returns the list of active users in the Room"""
-        if self.activeUserCount == 0:
-            logger.info("Empty room %s" % self.roomName)
-            return list()
-       
-        userList = list()
-        for user in self.activeUsers:
-            userList.append(user.userName)
-
-        return userList
-
-
-    # delete all users in the active users list
-    # Change it to static method and pass the object room.
-    def terminateRoom(self):
-        """Force quit the users from the room
-
-        Return: (status <bool>, remaining users <int>)
-            (True, 0) if no users in the room
-            (True, count) if room is deleted, and count users are still left
-            (False, count) if room is not deleted
-        """
-        if self.activeUserCount == 0:
-            logger.info('Successfully deleted room %s' %(self.roomName))
-            return True, self.activeUserCount
-
-        # Handle active users
-        for user in self.activeUsers:
-            user.leaveRoom(self)
-            self.activeUserCount -= 1
-
-        remainingUsers = self.activeUserCount
-        del self  # Delete the class
-        return True, remainingUsers
-
-
-
-def Test():
-    from IPython import embed
-    u1 = User()
-    u2 = User()
-    u3 = User('sayooj')
-    u4 = User('samuel')
-
-    r1 = Room('Download-1')
-    # test changeStatus()
-    r1.changeStatus(Room.OFFLINE)
-    r1.changeStatus(Room.ONLINE)
-
-    # test addUser()
-    r1.addUser(u3)
+try:
+    while True:
+        time.sleep(86400)
+except KeyboardInterrupt:
+    server.stop(0)
+    logger.info("Dragonvault terminated. Please restart the server manually")
