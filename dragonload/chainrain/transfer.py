@@ -2,6 +2,9 @@
 
 import os.path
 import shutil # this instead of mmap
+import time
+import requests
+from tqdm import *
 from subprocess import Popen, PIPE
 from dragonload.util.logging import logger
 from dragonload.chainrain.util import get_host_details
@@ -28,7 +31,7 @@ HOME = os.path.expanduser('~/Downloads/Dragonload/')
 
 def checkFilesExist(fileName: str) -> bool:
     """ Returns True if the file exist """
-    if os.path.exist(fileName):
+    if os.path.exists(fileName):
         return True
 
     return False
@@ -72,7 +75,7 @@ def getPart(filename: str, partNumber: int, hostIP: str) -> (bool, str):
    hostPort = 11112 #NOTE: fixed port for all #None # ?? from config file
    partitionFilename = filename + ".part" + (str(partNumber).rjust(3, '0'))
 
-   url = ":".join(hostIP, hostPort) + "/" + partitionFilename
+   url = "http://" + ":".join([hostIP, str(hostPort)]) + "/" + partitionFilename
    try:
        r = requests.get(url, stream = True)
        r.raise_for_status()
@@ -80,10 +83,10 @@ def getPart(filename: str, partNumber: int, hostIP: str) -> (bool, str):
        logger.fatal(err)
        return (False, None)
 
-   logger.info("Getting part %s from user %.." % (partitionFilename, hostIP))
+   logger.info("Getting part %s from user %s" % (partitionFilename, hostIP))
    fileSegmentSize = int(r.headers.get('Content-Length'))
    chunkSize = 1024
-   with open(os.path.join(HOME, filename), "wb") as fp:
+   with open(os.path.join(HOME, partitionFilename), "wb") as fp:
        pbar = tqdm(unit = "B", total = fileSegmentSize)
        for chunk in r.iter_content(chunk_size = chunkSize):
            if chunk: # filter-out keep-alive chunks
@@ -103,14 +106,14 @@ def mergePartitions(filename: str, total_partitions: int) -> (bool, str):
     fileExistStatus = True
     for part in range(total_partitions):
         partitionFilename = os.path.join(HOME, filename) + ".part" + (str(part).rjust(3, '0'))
-        fileExistStatus = fileExistStatus and checkFilesExist(partitonFilename)
+        fileExistStatus = fileExistStatus and checkFilesExist(partitionFilename)
 
     if not fileExistStatus:
         logger.critical("Not all parts available in the directory: Initiating Chainrain again")
         return False, None
 
     """ Merger all the partitions together into one output file """
-    outputFile = open(os.join(HOME, filename),'ab')
+    outputFile = open(os.path.join(HOME, filename),'ab')
 
     for part in range(total_partitions):
         partitionFilename = os.path.join(HOME, filename) + ".part" + (str(part).rjust(3, '0'))
@@ -121,13 +124,13 @@ def mergePartitions(filename: str, total_partitions: int) -> (bool, str):
                 inputBuffer = inputFile.read(CHUNK_SIZE * 10)
                 if not inputBuffer:
                     break
-                outputFile.write(intputBuffer)
+                outputFile.write(inputBuffer)
         logger.info("Completed merging part %d of %d" % (part, total_partitions))
 
     outputFile.close()
     logger.info("Complted merge procedure")
 
-    assert checkFileExist(os.path.join(HOME, filename))
+    assert checkFilesExist(os.path.join(HOME, filename))
 
     return True, filename
 
@@ -153,6 +156,10 @@ def transferManager(filename: str, user_count: int, user_id: int, user_list):
             # Self user, continue
             continue
 
+        # blocking wait for other_user to start the server
+        checkInactiveUsers(other_ip_address)
+
+
         # FIXME: calculate part number instead of this dirty trick
         status, _ = getPart(filename, other_id, other_ip_address)
        
@@ -163,5 +170,12 @@ def transferManager(filename: str, user_count: int, user_id: int, user_list):
 
     pass
 
-def checkInactiveUsers():
-    pass
+def checkInactiveUsers(ip_addr):
+    while True:
+        try:
+            if requests.get('http://' + ip_addr + ":11112").status_code == 200:
+                return True
+                break
+        except:
+            time.sleep(1)
+    return True

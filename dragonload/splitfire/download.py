@@ -147,7 +147,7 @@ def partitionManager(url: str, fileSize: int, user_count: int, user_id: int) -> 
     statusList, _ = zip(*downloadStatus)
     if all(status == True for status in statusList):
         logger.info("splitfire Successfull")
-    return True
+    return True, filename
 
 
 """

@@ -7,5 +7,5 @@ def startDownload(url: str, user_count: int, user_id: int):
     logger.info("Initiating Splitfire")
     status, fileSize = checkAcceptRange(url)
     if status == True:
-        out = partitionManager(url, fileSize, user_count, user_id)
-    return out
+        success, filename = partitionManager(url, fileSize, user_count, user_id)
+    return success, filename
