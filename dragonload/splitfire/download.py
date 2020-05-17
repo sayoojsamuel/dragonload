@@ -54,9 +54,9 @@ def calculateByteRange(fileSize: int, parts: int):
     partitionSize = fileSize // parts
     current = 0
     for i in range(parts-1):
-        byteRanges.append((current, current+partitionSize))
+        byteRanges.append((current, current+partitionSize-1))
         current += partitionSize
-    byteRanges.append((current, fileSize))
+    byteRanges.append((current, fileSize-1))
     return byteRanges
 
 
@@ -112,8 +112,10 @@ def downloadPart(url: str, start: int, end: int, filename: str) -> (bool, str):
     pass
 
 
-def partitionManager(url: str, fileSize: int, user_count: int) -> bool:
+def partitionManager(url: str, fileSize: int, user_count: int, user_id: int) -> bool:
     """Returns the segmentRanges for the partitions.
+
+    user_id: the id of current_user, always < user_count
 
     This is supposed to be a multiple of activeParties
     - Manages File Names
@@ -123,12 +125,18 @@ def partitionManager(url: str, fileSize: int, user_count: int) -> bool:
     checkDownloadDirectory(HOME)
 
     filename = url.split('/')[-1]
-    total_partitions = TRESHOLD * user_count
+    #total_partitions = TRESHOLD * user_count
+    total_partitions = user_count
 
     byteRanges = calculateByteRange(fileSize, total_partitions)
     downloadStatus = list()
+
     # InitiateDownload
     for counter, (start, end) in enumerate(byteRanges):
+        # Download only parts assigned to current_user
+        # Currently implemented to download - counter % user_id
+        if not counter % user_count == user_id:
+            continue
         # Each partition is specified by three digit representation
         partitionFilename = filename + ".part" + (str(counter).rjust(3, '0'))
         status, successFile = downloadPart(url, start, end, partitionFilename)
@@ -142,10 +150,15 @@ def partitionManager(url: str, fileSize: int, user_count: int) -> bool:
     return True
 
 
+"""
 class Test():
     #testFileURL="https://fgig.ir/movie/2019/Aladdin-2019_480.mp4"
-    testFileURL = "http://9092.ultratv100.com:9090/movies/Batch219/47%20Ronin%20%282013%29/47%20Ronin%20%282013%29.mp4"
+    #testFileURL = "http://9092.ultratv100.com:9090/movies/Batch219/47%20Ronin%20%282013%29/47%20Ronin%20%282013%29.mp4"
+    #testFileURL = "http://robots.stanford.edu/movies/good.people.avi"
+    #testFileURL = "https://www.lcse.umn.edu/movies/MS1-Test2_11.avi"
+    testFileURL = "https://www.lcse.umn.edu/movies/c34vslice.mpg"
     status, fileSize = checkAcceptRange(testFileURL)
-    out = partitionManager(testFileURL, fileSize, 100)
+    out = partitionManager(testFileURL, fileSize, user_count=2, user_id=1)
     #if status:
     #    status, filename = downloadPart(testFileURL, 0, int(fileSize/100), "Alladin-2019.mp4.part1")
+"""

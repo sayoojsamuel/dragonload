@@ -56,7 +56,8 @@ class FileServerHandler:
     @classmethod
     def start(cls):
         """ Start the File Server """
-        cls.fileServer = Popen(['python','httpServer.py'], stdout=PIPE, stderr=PIPE)
+        # python = python3 FIXME: Decide universally
+        cls.fileServer = Popen(['python3','httpServer.py'], stdout=PIPE, stderr=PIPE)
         logger.info("Initiating local file server at %s" % (HOME))
 
     @classmethod
@@ -66,13 +67,12 @@ class FileServerHandler:
         logger.info("Terminated local file server at %s" % (HOME))
 
 
-# FIXME: hostPort
-def getPart(partNumber: int, hostIP: str) -> (bool, str):
-   # TODO: determine the filename
-   # FIX: Database?
-   filename = None
-   hostPort = None # ?? from config file
-   url = ":".join(hostIP, hostPort) + "/" + filename
+def getPart(filename: str, partNumber: int, hostIP: str) -> (bool, str):
+
+   hostPort = 11112 #NOTE: fixed port for all #None # ?? from config file
+   partitionFilename = filename + ".part" + (str(partNumber).rjust(3, '0'))
+
+   url = ":".join(hostIP, hostPort) + "/" + partitionFilename
    try:
        r = requests.get(url, stream = True)
        r.raise_for_status()
@@ -80,7 +80,7 @@ def getPart(partNumber: int, hostIP: str) -> (bool, str):
        logger.fatal(err)
        return (False, None)
 
-   logger.info("Getting part %s from user %.." % (filename, hostIP))
+   logger.info("Getting part %s from user %.." % (partitionFilename, hostIP))
    fileSegmentSize = int(r.headers.get('Content-Length'))
    chunkSize = 1024
    with open(os.path.join(HOME, filename), "wb") as fp:
@@ -89,8 +89,8 @@ def getPart(partNumber: int, hostIP: str) -> (bool, str):
            if chunk: # filter-out keep-alive chunks
                pbar.update(len(chunk))
                fp.write(chunk)
-   logger.info("Downloading complete for %s from %s" % (filename, hostIP))
-   return (True, filename)
+   logger.info("Downloading complete for %s from %s" % (partitionFilename, hostIP))
+   return (True, partitionFilename)
 
 
 
@@ -132,10 +132,35 @@ def mergePartitions(filename: str, total_partitions: int) -> (bool, str):
     return True, filename
 
 
-def Handler():
+def transferManager(filename: str, user_count: int, user_id: int, user_list):
     """
     Handle the proto
+
+    user_list contains user_id, ip_address
     """
+
+    assert(user_count == len(user_list)), "Users do not Match"
+
+
+    ## Initiate local fileserver
+    ## FIXME: Initiate long before server start?
+    fs = FileServerHandler()
+    fs.start() # non blocking
+
+    ## see to the sharing part
+    for other_id, other_ip_address in user_list:
+        if other_id == user_id:
+            # Self user, continue
+            continue
+
+        # FIXME: calculate part number instead of this dirty trick
+        status, _ = getPart(filename, other_id, other_ip_address)
+       
+
+
+    ## Call merge parts
+    status, _filename = mergePartitions(filename, user_count)
+
     pass
 
 def checkInactiveUsers():
