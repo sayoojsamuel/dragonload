@@ -65,3 +65,8 @@ manager.  This can be implemented in two ways:
 ** ISSUES:
 - [ ] Fix the port issue. Update the server with the users port address in
   addition to the IP address.  Code everything in __main__ file.
+  
+** ENHANCEMENTS:
+- [ ] Use python dataclasses
+- [ ] Make a custom URI scheme (dragon://)
+- [ ] Gossip framework for status sharing??
