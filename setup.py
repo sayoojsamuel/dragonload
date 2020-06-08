@@ -9,5 +9,6 @@ setup(name='dragonload',
       author='Sayooj Samuel',
       author_email='sayoojsamuelgreat@gmail.com',
       license='MIT',
+      install_requires=["coloredlogs", "tqdm", "requests"],
       packages=['dragonload'],
       zip_safe=False)

@@ -14,5 +14,5 @@ def test_2_user():
     url = "http://www.ai.sri.com/movies/office.avi"
     user_count = 2
     user_id = 0 # set 1 in other user
-    user_list = [(0, "192.168.43.108"), (1, "192.168.43.194")]
+    user_list = [(0, "192.168.29.108"), (1, "192.168.29.194")]
     startDragonload(url, user_count, user_id, user_list)

@@ -147,11 +147,9 @@ def transferManager(filename: str, user_count: int, user_id: int, user_list):
 
     ## Initiate local fileserver
     ## FIXME: Initiate long before server start?
-    #fs = FileServerHandler()
-    #fs.start() # non blocking
+    fs = FileServerHandler()
+    fs.start() # non blocking
 
-    time.sleep(6) # waiting for other user to complete the download
-    
     ## see to the sharing part
     for other_id, other_ip_address in user_list:
         if other_id == user_id:
@@ -159,7 +157,7 @@ def transferManager(filename: str, user_count: int, user_id: int, user_list):
             continue
 
         # blocking wait for other_user to start the server
-        checkInactiveUsers(other_ip_address, filename, other_id)
+        checkInactiveUsers(other_ip_address)
 
 
         # FIXME: calculate part number instead of this dirty trick
@@ -172,15 +170,12 @@ def transferManager(filename: str, user_count: int, user_id: int, user_list):
 
     pass
 
-def checkInactiveUsers(ip_addr, filename, partNumber):
-
-    partitionFilename = filename + ".part" + (str(partNumber).rjust(3, '0'))
+def checkInactiveUsers(ip_addr):
     while True:
         try:
-            if requests.head('http://' + ip_addr + ":11112/"+partitionFilename).status_code == 200:
+            if requests.get('http://' + ip_addr + ":11112").status_code == 200:
                 return True
                 break
         except:
             time.sleep(1)
-            logger.info("Waiting for user at ip: "+ip_addr)
     return True
