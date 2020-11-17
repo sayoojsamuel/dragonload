@@ -17,8 +17,10 @@ Download
 --------
 Head over to out Source Repo and clone the project
 
+```bash
 git clone github.com/sayoojsamuel/dragonload
 cd dragonload
+```
 
 Installation
 --------
@@ -34,15 +36,8 @@ python setup.py develop
 Sample Config File
 --------
 
-```python
-from dragonload.dragonload import startDragonload
+![](assets/snippet2.png)
 
-url = "http://www.google.com/movies/security.mp4"
-user_count = 2
-user_id = 0 # set 1 in other user
-user_list = [(0, "192.168.29.108"), (1, "192.168.29.194")]
-startDragonload(url, user_count, user_id, user_list)
-```
 
 Download Engine Sequence Diagram
 --------
@@ -62,7 +57,7 @@ Web App User Engagements
         2.  [ChainRain Protocol](#org86c1216)
         3.  [Dragonvault Protocol](#orgbf45f1c)
     4.  [Ideas](#org1022ce9)
-        1.  [Simustaneous running of Splitfile and ChainRain in pipeline](#org32f5fd2)
+        1.  [Simultaneous running of Splitfile and ChainRain in pipeline](#org32f5fd2)
         2.  [Add MultiThreaded Download for individual parts](#org9ca9749)
         3.  [Authenticated Private Rooms](#org403f71c)
         4.  [curses based application](#org22a9628)
@@ -168,7 +163,7 @@ manager.  This can be implemented in two ways:
 
 <a id="org32f5fd2"></a>
 
-### [ ] Simustaneous running of Splitfile and ChainRain in pipeline
+### [ ] Simultaneous running of Splitfile and ChainRain in pipeline
 
 
 <a id="org9ca9749"></a>
