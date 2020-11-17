@@ -1,8 +1,15 @@
 Dragonload Distributed Download Manager
 =========================
-![](assets/dragonload.png)
 
-MacOS/Linux: build|Passing
+![Version 1.4](http://img.shields.io/badge/version-v1.4-green.svg)
+![Python 3.8](http://img.shields.io/badge/python-3.8-blue.svg)
+[![MIT License](http://img.shields.io/badge/license-MIT%20License-blue.svg)](https://github.com/sayoojsamuel/dragonload/blob/master/LICENSE)
+[![sayoojsamuel Twitter](http://img.shields.io/twitter/url/http/shields.io.svg?style=social&label=Follow)](https://twitter.com/sayoojsamuel)
+
+
+![](assets/banner2.png)
+
+Dragonload is a state of the art  Distributed Download Manager written in Python to distribute large scale downloads on different machines to better utilize high-speed intranet connected to low-speed internet.
 
 Developed by Team Madcaps
 
@@ -15,11 +22,14 @@ cd dragonload
 
 Installation
 --------
+```bash
 python setup.py install
-
+```
 Developer Mode
 --------
+```bash
 python setup.py develop
+```
 
 Sample Config File
 --------
