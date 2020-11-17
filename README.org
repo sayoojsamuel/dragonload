@@ -70,3 +70,16 @@ manager.  This can be implemented in two ways:
 - [ ] Use python dataclasses
 - [ ] Make a custom URI scheme (dragon://)
 - [ ] Gossip framework for status sharing??
+
+** Config File
+
+```python
+from dragonload.dragonload import startDragonload
+
+url = "http://www.google.com/movies/security.mp4"
+user_count = 2
+user_id = 0 # set 1 in other user
+user_list = [(0, "192.168.29.108"), (1, "192.168.29.194")]
+startDragonload(url, user_count, user_id, user_list)
+```
+
