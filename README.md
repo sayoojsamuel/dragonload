@@ -1,7 +1,7 @@
 Dragonload Distributed Download Manager
 =========================
 
-![Version 1.4](http://img.shields.io/badge/version-v1.4-green.svg)
+![Version 1.0](http://img.shields.io/badge/version-v1.0-green.svg)
 ![Python 3.8](http://img.shields.io/badge/python-3.8-blue.svg)
 [![MIT License](http://img.shields.io/badge/license-MIT%20License-blue.svg)](https://github.com/sayoojsamuel/dragonload/blob/master/LICENSE)
 [![sayoojsamuel Twitter](http://img.shields.io/twitter/url/http/shields.io.svg?style=social&label=Follow)](https://twitter.com/sayoojsamuel)
